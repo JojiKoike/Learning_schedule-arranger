@@ -12,11 +12,14 @@ var app = express();
 // Security Enhancement
 app.use(helmet());
 
+// Environment Check
+var isLocalDevEnv = (app.get('env') === "development") || (app.get('env') === "test")
+
 // GitHub OAuth Authentication
 var GitHubStrategy = require('passport-github2').Strategy;
-var config = app.get('env') === "development"? require('./config.json') : ""
-var GITHUB_CLIENT_ID = app.get('env') === "development"? config.GITHUB_CLIENT_ID : process.env.GITHUB_CLIENT_ID;
-var GITHUB_CLIENT_SECRET = app.get('env') === "development"? config.GITHUB_CLIENT_SECRET : process.env.GITHUB_CLIENT_SECRET;
+var config = isLocalDevEnv ? require('./config.json') : ""
+var GITHUB_CLIENT_ID = isLocalDevEnv ? config.GITHUB_CLIENT_ID : process.env.GITHUB_CLIENT_ID;
+var GITHUB_CLIENT_SECRET = isLocalDevEnv ? config.GITHUB_CLIENT_SECRET : process.env.GITHUB_CLIENT_SECRET;
 
 passport.serializeUser((user, done) => {
   done(null, user);
@@ -53,7 +56,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({
-  secret: app.get('env') === "development" ? config.GITHUB_SESSION_SECRET : process.env.GITHUB_SESSION_SECRET,
+  secret: isLocalDevEnv ? config.GITHUB_SESSION_SECRET : process.env.GITHUB_SESSION_SECRET,
   resave: false,
   saveUninitialized: false
 }));
