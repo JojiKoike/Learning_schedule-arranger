@@ -7,10 +7,30 @@ var helmet = require('helmet');
 var session = require('express-session');
 var passport = require('passport');
 
+// Load Models
+var User = require('./models/user');
+var Schedule = require('./models/schedule');
+var Availability = require('./models/availability');
+var Candidate = require('./models/candidate');
+var Comment = require('./models/comment');
+
 var app = express();
 
 // Security Enhancement
 app.use(helmet());
+
+// Database Sync
+User.sync().then(() => {
+  Schedule.belongsTo(User, {foreignKey: 'createdBy'});
+  Schedule.sync();
+  Comment.belongsTo(User, {foreignKey: 'userId'});
+  Comment.sync();
+  Availability.belongsTo(User, {foreignKey: 'userId'});
+  Candidate.sync().then(() => {
+    Availability.belongsTo(Candidate, {foreignKey: 'candidateId'});
+    Availability.sync();
+  });
+});
 
 // Environment Check
 var isLocalDevEnv = (app.get('env') === "development") || (app.get('env') === "test")
@@ -35,7 +55,12 @@ passport.use(new GitHubStrategy({
   callbackURL: 'http://192.168.33.10:8000/auth/github/callback'
 },(accessToken, refreshToken, profile, done) => {
     process.nextTick(() => {
-      return done(null, profile);
+      User.upsert({
+        userId: profile.id,
+        username: profile.username
+      }).then(() => {
+        done(null,profile);
+      });
     });
   }
 ));
