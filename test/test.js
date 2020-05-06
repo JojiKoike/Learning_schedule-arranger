@@ -79,7 +79,7 @@ describe('/schedules', () => {
             .end((err, res) => {
               deleteScheduleAggregate(createdSchedulePath.split('/schedules/')[1], done, err);
             });
-       });
+        });
     });
   });
 });
