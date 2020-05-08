@@ -84,7 +84,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({
-  secret: isLocalDevEnv ? config.GITHUB_SESSION_SECRET : process.env.GITHUB_SESSION_SECRET,
+  secret: isLocalDevEnv ? config.SESSION_SECRET : process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false
 }));
