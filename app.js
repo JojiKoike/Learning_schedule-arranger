@@ -106,7 +106,17 @@ app.get('/auth/github',
 
 app.get('/auth/github/callback',
   passport.authenticate('github', { failureRedirect: '/login' }),
-  (req, res) => { res.redirect('/'); }
+  (req, res) => {
+    var loginFrom = req.cookies.loginFrom;
+    // オープンリダイレクタ脆弱性対策
+    if (loginFrom && !loginFrom.includes('http://') && !loginFrom.includes('https://')) {
+      res.clearCookie('loginFrom');
+      res.redirect(loginFrom);
+    } else {
+      res.redirect('/');
+    }
+    res.redirect('/');
+  }
 );
 
 // catch 404 and forward to error handler

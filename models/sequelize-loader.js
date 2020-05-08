@@ -6,7 +6,7 @@ var app = express();
 
 var isLocalDevEnv = app.get('env') === "development" || app.get('env') === "test"
 var config = isLocalDevEnv ? require('../config.json') : "";
-var DB_URL = isLocalDevEnv ? config.DB_URL : process.env.DB_URL;
+var DB_URL = isLocalDevEnv ? config.DB_URL : process.env.DATABASE_URL;
 
 const sequelize = new Sequelize(DB_URL);
 
